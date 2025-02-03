@@ -1,18 +1,26 @@
-import { Injectable } from '@angular/core';
+import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { UserWorkout } from '../models/workout.model';
+import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WorkoutDataService {
   private users = new BehaviorSubject<UserWorkout[]>([]);
+  private isBrowser: boolean;
   
-  constructor() {
+  constructor(@Inject(PLATFORM_ID) platformId: Object) {
+    this.isBrowser = isPlatformBrowser(platformId);
     this.loadInitialData();
   }
 
   private loadInitialData(): void {
+    if (!this.isBrowser) {
+      this.users.next([]);
+      return;
+    }
+
     const savedData = localStorage.getItem('userData');
     if (savedData) {
       this.users.next(JSON.parse(savedData));
@@ -49,7 +57,9 @@ export class WorkoutDataService {
   }
 
   private saveToLocalStorage(): void {
-    localStorage.setItem('userData', JSON.stringify(this.users.value));
+    if (this.isBrowser) {
+      localStorage.setItem('userData', JSON.stringify(this.users.value));
+    }
   }
 
   getUsers(): Observable<UserWorkout[]> {
