@@ -1,48 +1,83 @@
 # Health Challenge Tracker
 
-A Single-Page Application built with Angular to track user workouts and fitness challenges.
+A modern Angular-based workout tracking application with Material UI and Tailwind CSS.
 
-## Features
+## Features Implemented
 
-- Add users and their workout sessions
-- View workouts in a paginated table
-- Search by username and filter by workout type
-- Visualize workout data with charts
-- Data persistence using localStorage
+- 🏋️ Workout Tracking System
+  - Add/Edit/Delete workouts
+  - User management
+  - Workout type categorization
+  - Duration tracking
 
-## Code Coverage
+- 📊 Data Management
+  - LocalStorage persistence
+  - SSR compatibility
+  - State management using Services
 
-The project maintains 100% code coverage for critical components:
+- 🎨 UI/UX
+  - Material Design components
+  - Responsive layout with Tailwind CSS
+  - Clean and modern interface
 
-- WorkoutDataService: 100%
-  - Lines: 100%
-  - Functions: 100%
-  - Branches: 100%
+## Technical Stack
 
-To view the coverage report locally:
-1. Run `ng test --code-coverage`
-2. Open `coverage/index.html` in a browser
+- Angular 19.1.0
+- Angular Material 19.1.2
+- Tailwind CSS 3.4.1
+- Chart.js 4.4.7
+- TypeScript 5.7.2
 
-## Development
+## Deployment
+
+The application is deployed on GitHub Pages:
+- URL: https://abhi-boostin.github.io/HEALTHUP/
+- CI/CD: GitHub Actions
+- Hosting: GitHub Pages
+
+## Development Setup
 
 1. Clone the repository
-2. Run `npm install`
-3. Run `ng serve` for a dev server
-4. Navigate to `http://localhost:4200/`
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Run development server:
+   ```bash
+   ng serve
+   ```
+4. Visit `http://localhost:4200`
 
-## Build
+## Testing
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+100% test coverage maintained for critical components:
 
-## Code Coverage
+```bash
+ng test --code-coverage
+```
 
-The project maintains 100% code coverage for critical components:
 
-- WorkoutDataService: 100%
-  - Lines: 100%
-  - Functions: 100%
-  - Branches: 100%
+## Deployment Steps
 
-To view the coverage report locally:
-1. Run `ng test --code-coverage`
-2. Open `coverage/index.html` in a browser
+1. Build production:
+   ```bash
+   ng build --configuration production
+   ```
+2. Deploy to GitHub Pages:
+   ```bash
+   ng deploy --base-href=/HEALTHUP/
+   ```
+
+## Project Structure
+
+- `/src/app/components`: UI Components
+- `/src/app/services`: Data Services
+- `/src/app/models`: TypeScript Interfaces
+
+
+## Contributing
+
+1. Fork the repository
+2. Create a new branch
+3. Make your changes and commit them
+4. Push to your fork and create a pull request
