@@ -7,7 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { WorkoutDataService } from '../../services/workout-data.service';
-import { Workout } from '../../models/workout.model';
+import { UserWorkout } from '../../models/workout.model';
 import { WorkoutFormComponent } from '../workout-form/workout-form.component';
 
 @Component({
@@ -44,25 +44,19 @@ import { WorkoutFormComponent } from '../workout-form/workout-form.component';
         </mat-form-field>
       </div>
 
-      <table mat-table [dataSource]="paginatedWorkouts" class="w-full">
-        <ng-container matColumnDef="userName">
+      <table mat-table [dataSource]="paginatedUsers" class="w-full">
+        <ng-container matColumnDef="name">
           <th mat-header-cell *matHeaderCellDef>User Name</th>
-          <td mat-cell *matCellDef="let workout">{{workout.userName}}</td>
+          <td mat-cell *matCellDef="let user">{{user.name}}</td>
         </ng-container>
 
-        <ng-container matColumnDef="workoutType">
-          <th mat-header-cell *matHeaderCellDef>Workout Type</th>
-          <td mat-cell *matCellDef="let workout">{{workout.workoutType}}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="minutes">
-          <th mat-header-cell *matHeaderCellDef>Minutes</th>
-          <td mat-cell *matCellDef="let workout">{{workout.minutes}}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="date">
-          <th mat-header-cell *matHeaderCellDef>Date</th>
-          <td mat-cell *matCellDef="let workout">{{workout.date | date}}</td>
+        <ng-container matColumnDef="workouts">
+          <th mat-header-cell *matHeaderCellDef>Workouts</th>
+          <td mat-cell *matCellDef="let user">
+            <div *ngFor="let workout of user.workouts">
+              {{workout.type}}: {{workout.minutes}} minutes
+            </div>
+          </td>
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
@@ -70,7 +64,7 @@ import { WorkoutFormComponent } from '../workout-form/workout-form.component';
       </table>
 
       <mat-paginator
-        [length]="filteredWorkouts.length"
+        [length]="filteredUsers.length"
         [pageSize]="pageSize"
         [pageSizeOptions]="[5, 10, 25]"
         (page)="onPageChange($event)">
@@ -79,10 +73,10 @@ import { WorkoutFormComponent } from '../workout-form/workout-form.component';
   `
 })
 export class WorkoutListComponent implements OnInit {
-  workouts: Workout[] = [];
-  filteredWorkouts: Workout[] = [];
-  paginatedWorkouts: Workout[] = [];
-  displayedColumns: string[] = ['userName', 'workoutType', 'minutes', 'date'];
+  users: UserWorkout[] = [];
+  filteredUsers: UserWorkout[] = [];
+  paginatedUsers: UserWorkout[] = [];
+  displayedColumns: string[] = ['name', 'workouts'];
   workoutTypes = ['Running', 'Yoga', 'Weight Training', 'Swimming', 'Cycling'];
   
   searchTerm = '';
@@ -93,29 +87,30 @@ export class WorkoutListComponent implements OnInit {
   constructor(private workoutService: WorkoutDataService) {}
 
   ngOnInit(): void {
-    this.workoutService.getWorkouts().subscribe(workouts => {
-      this.workouts = workouts;
+    this.workoutService.getUsers().subscribe(users => {
+      this.users = users;
       this.applyFilters();
     });
   }
 
   applyFilters(): void {
-    this.filteredWorkouts = this.workouts.filter(workout => {
-      const nameMatch = workout.userName.toLowerCase().includes(this.searchTerm.toLowerCase());
-      const typeMatch = !this.selectedType || workout.workoutType === this.selectedType;
+    this.filteredUsers = this.users.filter(user => {
+      const nameMatch = user.name.toLowerCase().includes(this.searchTerm.toLowerCase());
+      const typeMatch = !this.selectedType || 
+        user.workouts.some(w => w.type === this.selectedType);
       return nameMatch && typeMatch;
     });
-    this.updatePaginatedWorkouts();
+    this.updatePaginatedUsers();
   }
 
-  updatePaginatedWorkouts(): void {
+  updatePaginatedUsers(): void {
     const startIndex = this.currentPage * this.pageSize;
-    this.paginatedWorkouts = this.filteredWorkouts.slice(startIndex, startIndex + this.pageSize);
+    this.paginatedUsers = this.filteredUsers.slice(startIndex, startIndex + this.pageSize);
   }
 
   onPageChange(event: PageEvent): void {
     this.currentPage = event.pageIndex;
     this.pageSize = event.pageSize;
-    this.updatePaginatedWorkouts();
+    this.updatePaginatedUsers();
   }
 }

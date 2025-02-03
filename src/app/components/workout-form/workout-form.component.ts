@@ -24,12 +24,12 @@ import { WorkoutDataService } from '../../services/workout-data.service';
       <form #workoutForm="ngForm" (ngSubmit)="onSubmit()" class="space-y-4">
         <mat-form-field class="w-full">
           <mat-label>User Name</mat-label>
-          <input matInput [(ngModel)]="workout.userName" name="userName" required>
+          <input matInput [(ngModel)]="userName" name="userName" required>
         </mat-form-field>
 
         <mat-form-field class="w-full">
           <mat-label>Workout Type</mat-label>
-          <mat-select [(ngModel)]="workout.workoutType" name="workoutType" required>
+          <mat-select [(ngModel)]="workoutType" name="workoutType" required>
             <mat-option *ngFor="let type of workoutTypes" [value]="type">
               {{type}}
             </mat-option>
@@ -38,7 +38,7 @@ import { WorkoutDataService } from '../../services/workout-data.service';
 
         <mat-form-field class="w-full">
           <mat-label>Minutes</mat-label>
-          <input matInput type="number" [(ngModel)]="workout.minutes" name="minutes" required min="1">
+          <input matInput type="number" [(ngModel)]="minutes" name="minutes" required min="1">
         </mat-form-field>
 
         <button mat-raised-button color="primary" type="submit" [disabled]="!workoutForm.valid">
@@ -49,24 +49,18 @@ import { WorkoutDataService } from '../../services/workout-data.service';
   `
 })
 export class WorkoutFormComponent {
-  workout = {
-    userName: '',
-    workoutType: '',
-    minutes: 0,
-    date: new Date()
-  };
+  userName = '';
+  workoutType = '';
+  minutes = 0;
 
-  workoutTypes = ['Running', 'Yoga', 'Weight Training', 'Swimming', 'Cycling'];
+  workoutTypes = ['Running', 'Cycling', 'Swimming', 'Yoga', 'Weight Training'];
 
   constructor(private workoutService: WorkoutDataService) {}
 
   onSubmit() {
-    this.workoutService.addWorkout(this.workout);
-    this.workout = {
-      userName: '',
-      workoutType: '',
-      minutes: 0,
-      date: new Date()
-    };
+    this.workoutService.addWorkout(this.userName, this.workoutType, this.minutes);
+    this.userName = '';
+    this.workoutType = '';
+    this.minutes = 0;
   }
 }

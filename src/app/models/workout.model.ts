@@ -1,7 +1,10 @@
-export interface Workout {
-  id: string;
-  userName: string;
-  workoutType: string;
+export interface WorkoutEntry {
+  type: string;
   minutes: number;
-  date: Date;
+}
+
+export interface UserWorkout {
+  id: number;
+  name: string;
+  workouts: WorkoutEntry[];
 } 

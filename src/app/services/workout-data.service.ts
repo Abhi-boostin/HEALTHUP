@@ -1,65 +1,77 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Workout } from '../models/workout.model';
+import { UserWorkout } from '../models/workout.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WorkoutDataService {
-  private workouts = new BehaviorSubject<Workout[]>([]);
+  private users = new BehaviorSubject<UserWorkout[]>([]);
   
   constructor() {
     this.loadInitialData();
   }
 
   private loadInitialData(): void {
-    const savedData = localStorage.getItem('workouts');
+    const savedData = localStorage.getItem('userData');
     if (savedData) {
-      this.workouts.next(JSON.parse(savedData));
+      this.users.next(JSON.parse(savedData));
     } else {
-      // Load default data
-      const defaultWorkouts: Workout[] = [
+      const defaultUsers: UserWorkout[] = [
         {
-          id: '1',
-          userName: 'John Doe',
-          workoutType: 'Running',
-          minutes: 30,
-          date: new Date('2024-03-10')
+          id: 1,
+          name: 'John Doe',
+          workouts: [
+            { type: 'Running', minutes: 30 },
+            { type: 'Cycling', minutes: 45 }
+          ]
         },
         {
-          id: '2',
-          userName: 'Jane Smith',
-          workoutType: 'Yoga',
-          minutes: 45,
-          date: new Date('2024-03-11')
+          id: 2,
+          name: 'Jane Smith',
+          workouts: [
+            { type: 'Swimming', minutes: 60 },
+            { type: 'Running', minutes: 20 }
+          ]
         },
         {
-          id: '3',
-          userName: 'Mike Johnson',
-          workoutType: 'Weight Training',
-          minutes: 60,
-          date: new Date('2024-03-12')
+          id: 3,
+          name: 'Mike Johnson',
+          workouts: [
+            { type: 'Yoga', minutes: 50 },
+            { type: 'Cycling', minutes: 40 }
+          ]
         }
       ];
-      this.workouts.next(defaultWorkouts);
+      this.users.next(defaultUsers);
       this.saveToLocalStorage();
     }
   }
 
   private saveToLocalStorage(): void {
-    localStorage.setItem('workouts', JSON.stringify(this.workouts.value));
+    localStorage.setItem('userData', JSON.stringify(this.users.value));
   }
 
-  getWorkouts(): Observable<Workout[]> {
-    return this.workouts.asObservable();
+  getUsers(): Observable<UserWorkout[]> {
+    return this.users.asObservable();
   }
 
-  addWorkout(workout: Omit<Workout, 'id'>): void {
-    const newWorkout = {
-      ...workout,
-      id: Date.now().toString(),
-    };
-    this.workouts.next([...this.workouts.value, newWorkout]);
+  addWorkout(name: string, workoutType: string, minutes: number): void {
+    const currentUsers = this.users.value;
+    const existingUser = currentUsers.find(user => user.name === name);
+
+    if (existingUser) {
+      existingUser.workouts.push({ type: workoutType, minutes });
+    } else {
+      const newUser: UserWorkout = {
+        id: Date.now(),
+        name,
+        workouts: [{ type: workoutType, minutes }]
+      };
+      currentUsers.push(newUser);
+    }
+
+    this.users.next(currentUsers);
     this.saveToLocalStorage();
   }
 }
