@@ -6,9 +6,13 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { WorkoutDataService } from '../../services/workout-data.service';
 import { UserWorkout } from '../../models/workout.model';
 import { WorkoutFormComponent } from '../workout-form/workout-form.component';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { UserDetailsComponent } from '../user-details/user-details.component';
 
 @Component({
   selector: 'app-workout-list',
@@ -21,7 +25,9 @@ import { WorkoutFormComponent } from '../workout-form/workout-form.component';
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    WorkoutFormComponent
+    MatIconModule,
+    WorkoutFormComponent,
+    MatDialogModule
   ],
   template: `
     <app-workout-form></app-workout-form>
@@ -47,7 +53,12 @@ import { WorkoutFormComponent } from '../workout-form/workout-form.component';
       <table mat-table [dataSource]="paginatedUsers" class="w-full">
         <ng-container matColumnDef="name">
           <th mat-header-cell *matHeaderCellDef>User Name</th>
-          <td mat-cell *matCellDef="let user">{{user.name}}</td>
+          <td mat-cell *matCellDef="let user">
+            <span class="text-blue-600 hover:underline cursor-pointer"
+                  (click)="showUserDetails(user)">
+              {{user.name}}
+            </span>
+          </td>
         </ng-container>
 
         <ng-container matColumnDef="workouts">
@@ -56,6 +67,15 @@ import { WorkoutFormComponent } from '../workout-form/workout-form.component';
             <div *ngFor="let workout of user.workouts">
               {{workout.type}}: {{workout.minutes}} minutes
             </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let user">
+            <button mat-icon-button color="warn" (click)="openDeleteDialog(user)">
+              <mat-icon>delete</mat-icon>
+            </button>
           </td>
         </ng-container>
 
@@ -76,7 +96,7 @@ export class WorkoutListComponent implements OnInit {
   users: UserWorkout[] = [];
   filteredUsers: UserWorkout[] = [];
   paginatedUsers: UserWorkout[] = [];
-  displayedColumns: string[] = ['name', 'workouts'];
+  displayedColumns: string[] = ['name', 'workouts', 'actions'];
   workoutTypes = ['Running', 'Yoga', 'Weight Training', 'Swimming', 'Cycling'];
   
   searchTerm = '';
@@ -84,7 +104,10 @@ export class WorkoutListComponent implements OnInit {
   pageSize = 5;
   currentPage = 0;
 
-  constructor(private workoutService: WorkoutDataService) {}
+  constructor(
+    private workoutService: WorkoutDataService,
+    private dialog: MatDialog
+  ) {}
 
   ngOnInit(): void {
     this.workoutService.getUsers().subscribe(users => {
@@ -112,5 +135,30 @@ export class WorkoutListComponent implements OnInit {
     this.currentPage = event.pageIndex;
     this.pageSize = event.pageSize;
     this.updatePaginatedUsers();
+  }
+
+  deleteUser(userId: number): void {
+    this.workoutService.deleteUser(userId);
+  }
+
+  openDeleteDialog(user: UserWorkout): void {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '300px',
+      data: { userName: user.name }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.deleteUser(user.id);
+      }
+    });
+  }
+
+  showUserDetails(user: UserWorkout): void {
+    this.dialog.open(UserDetailsComponent, {
+      width: '600px',
+      data: { user },
+      panelClass: 'rounded-lg'
+    });
   }
 }

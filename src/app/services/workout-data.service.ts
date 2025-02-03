@@ -74,4 +74,10 @@ export class WorkoutDataService {
     this.users.next(currentUsers);
     this.saveToLocalStorage();
   }
+
+  deleteUser(userId: number): void {
+    const currentUsers = this.users.value.filter(user => user.id !== userId);
+    this.users.next(currentUsers);
+    this.saveToLocalStorage();
+  }
 }
